@@ -1,14 +1,14 @@
 def main():
     matrix = [
-        [(0, 3), (0, 2), (0, 1), (0, 0), (0, -1)],
-        [(1, 0), (-1, 2), (-1, 1), (-1, 0), (-1, -1)],
-        [(0, 0), (0, -1), (-2, 1), (-2, 0), (-2, -1)],
-        [(-1, 0), (-1, -1), (-1, -2), (-3, 0), (-3, -1)],
-        [(-2, 0), (-2, -1), (-2, -2), (-2, -3), (-4, -1)]
+        [(2, 4), (2, 5)],
+        [(2, 0), (7, 1)],
+        [(6, 5), (1, 2)],
+        [(5, 6), (3, 0)]
     ]
     p = Rational(matrix)
     p.iterative_eliminate_pure_dominated()
-    print(p.reconstruct_matrix())
+    print(p.get_strategies())
+
 
 class Rational(object):
 
@@ -45,6 +45,7 @@ class Rational(object):
             p1_len, p2_len = len(self.p1_utility), len(self.p2_utility)
             self.one_round_pure_dominated_elimination()
             if p1_len == len(self.p1_utility) and p2_len == len(self.p2_utility):
+                self.reconstruct_matrix()
                 break
 
     # Helper function to eliminate strictly dominated pure strategies
@@ -79,9 +80,10 @@ class Rational(object):
 
 
     def one_round_mixed_dominated_strategy_elimination(self):
-        if len(self.p1_utility) > 3:
+        p1_strategies, p2_strategies = self.get_strategies()
+        if p1_strategies >= 3:
             self.eliminate_mixed_dominated(self.p1_utility, self.p2_utility)
-        if len(self.p2_utility) > 3:
+        if p2_strategies > 3:
             self.eliminate_mixed_dominated(self.p2_utility, self.p1_utility)
         return self.p1_utility, self.p2_utility
 
