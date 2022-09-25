@@ -7,7 +7,10 @@ def main():
     ]
     p = Rational(matrix)
     p.iterative_eliminate_pure_dominated()
+    print(p.get_utility())
+    print(p.get_matrix())
     print(p.get_strategies())
+
 
 
 class Rational(object):
@@ -33,22 +36,44 @@ class Rational(object):
     def get_strategies(self):
         return self.p1_stratigies, self.p2_stratigies
 
-    # Eliminated strictly dominated pure strategy for one round
-    def one_round_pure_dominated_elimination(self):
-        self.eliminate_pure_dominated(self.p1_utility, self.p2_utility)
-        self.eliminate_pure_dominated(self.p2_utility, self.p1_utility)
-        return self.p1_utility, self.p2_utility
+    def get_matrix(self):
+        return self.matrix
 
-    # Iterative elimination
+    def set_matrix(self):
+        p1_utility, p2_utility = self.get_utility()
+        p2_utility = list(map(list, zip(*p2_utility)))
+        matrix = [[] for _ in range(len(p1_utility))]
+        for row in range(len(p1_utility)):
+            for col in range(len(p1_utility[0])):
+                pair = p1_utility[row][col], p2_utility[row][col]
+                matrix[row].append(pair)
+
+        # Update matrix information
+        self.matrix = matrix
+        self.p1_stratigies = len(matrix)
+        self.p2_stratigies = len(matrix[0])
+
     def iterative_eliminate_pure_dominated(self):
         while True:
             p1_len, p2_len = len(self.p1_utility), len(self.p2_utility)
-            self.one_round_pure_dominated_elimination()
+            self.eliminate_pure_dominated(self.p1_utility, self.p2_utility)
+            self.eliminate_pure_dominated(self.p2_utility, self.p1_utility)
             if p1_len == len(self.p1_utility) and p2_len == len(self.p2_utility):
-                self.reconstruct_matrix()
+                self.set_matrix()
                 break
 
-    # Helper function to eliminate strictly dominated pure strategies
+    def iterative_eliminate_mixed_dominated(self):
+        while True:
+            p1_len, p2_len = len(self.p1_utility), len(self.p2_utility)
+            if p1_len >= 3:
+                self.eliminate_mixed_dominated(self.p1_utility, self.p2_utility)
+            if p2_len >= 3:
+                self.eliminate_mixed_dominated(self.p2_utility, self.p1_utility)
+            if p1_len == len(self.p1_utility) and p2_len == len(self.p2_utility):
+                self.set_matrix()
+                self.set_matrix()
+                break
+
     def eliminate_pure_dominated(self, p_utility, q_utility):
 
         # While one strategy for player p is eliminated, q's value should also be eliminated
@@ -78,35 +103,12 @@ class Rational(object):
                         p_utility.remove(p_utility[i])
                         eliminate_q(q_utility, i)
 
-
-    def one_round_mixed_dominated_strategy_elimination(self):
-        p1_strategies, p2_strategies = self.get_strategies()
-        if p1_strategies >= 3:
-            self.eliminate_mixed_dominated(self.p1_utility, self.p2_utility)
-        if p2_strategies > 3:
-            self.eliminate_mixed_dominated(self.p2_utility, self.p1_utility)
-        return self.p1_utility, self.p2_utility
-
     def eliminate_mixed_dominated(self, p_utility, q_utility):
         pass
         
 
 
-    # Reconstruct matrix after elimination
-    def reconstruct_matrix(self):
-        p1_utility, p2_utility = self.get_utility()
-        p2_utility = list(map(list, zip(*p2_utility)))
-        matrix = [[] for _ in range(len(p1_utility))]
-        for row in range(len(p1_utility)):
-            for col in range(len(p1_utility[0])):
-                pair = p1_utility[row][col], p2_utility[row][col]
-                matrix[row].append(pair)
-
-        # Update matrix information
-        self.matrix = matrix
-        self.p1_stratigies = len(matrix)
-        self.p2_stratigies = len(matrix[0])
-        return self.matrix
+    
 
 if __name__ == "__main__":
     main()
