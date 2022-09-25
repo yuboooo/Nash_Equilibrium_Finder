@@ -1,4 +1,4 @@
-import Nash_Equilibrium_Finder.rationalizable as r
+import rationalizable as r
 
 def test_get_utility():
     matrix = [
@@ -23,14 +23,14 @@ def test_get_utility():
         [[4, 3, 5], [1, 2, 3]]
     )
 
-def test_rational_pure_strategies():
+def test_iterative_eliminate_pure_dominated():
     matrix = [
         [(2, 4), (1, 1)],
         [(1, 3), (1, 2)],
         [(0, 5), (6, 3)]
     ]
     p = r.Rational(matrix)
-    p.iterative_eliminate_dominated_pure()
+    p.iterative_eliminate_pure_dominated()
     assert p.get_utility() == ([[2]], [[4]])
 
     matrix = [
@@ -39,7 +39,7 @@ def test_rational_pure_strategies():
         [(0, 5), (6, 3), (4, 2)]
     ]
     p = r.Rational(matrix)
-    p.iterative_eliminate_dominated_pure()
+    p.iterative_eliminate_pure_dominated()
     assert p.get_utility() == ([[2]], [[4]])
 
 def test_reconstruction_matrix():
@@ -51,7 +51,7 @@ def test_reconstruction_matrix():
         [(-2, 0), (-2, -1), (-2, -2), (-2, -3), (-4, -1)]
     ]
     p = r.Rational(matrix)
-    p.iterative_eliminate_dominated_pure()
+    p.iterative_eliminate_pure_dominated()
     assert p.reconstruct_matrix() == [
         [(0, 3), (0, 2), (0, 1)], 
         [(1, 0), (-1, 2), (-1, 1)], 
@@ -63,5 +63,5 @@ def test_reconstruction_matrix():
         [(0, 5), (6, 3), (4, 2)]
     ]
     p = r.Rational(matrix)
-    p.iterative_eliminate_dominated_pure()
+    p.iterative_eliminate_pure_dominated()
     assert p.reconstruct_matrix() == [[(2, 4)]]
